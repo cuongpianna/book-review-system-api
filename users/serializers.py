@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 
 from rest_framework import serializers
+from rest_framework.authtoken.models import Token
 
 from .models import Profile
 
@@ -32,5 +33,16 @@ class UserCreateSerializer(serializers.ModelSerializer):
             )
         user.set_password(validated_data.get('password'))
         user.save()
+        Token.objects.create(user=user)
         return user
+
+class UserLoginSerializer(serializers.ModelSerializer):
+    token = serializers.CharField(allow_blank=True, read_only=True)
+    username = serializers.CharField()
+    class Meta:
+        model = User
+        fields = ['username','password','token']
+        extra_kwargs = {"password":
+                            {"write_only": True}
+                        }
 
