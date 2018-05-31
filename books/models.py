@@ -29,3 +29,22 @@ class Book(models.Model):
 
     def __str__(self):
         return self.title
+
+class Comment(models.Model):
+    book = models.ForeignKey(Book,on_delete=models.CASCADE,related_name='comments')
+    owner = models.ForeignKey(User,on_delete=models.CASCADE,related_name='comment')
+    text = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    parrent = models.ForeignKey('self',null=True,related_name='replies',on_delete=models.CASCADE,blank=True)
+
+    @property
+    def is_parrent(self):
+        if self.parrent is not None:
+            return False
+        return True
+
+class Rate(models.Model):
+    owner = models.ForeignKey(User,on_delete=models.CASCADE,related_name='rate')
+    book = models.ForeignKey(Book,on_delete=models.CASCADE,related_name='rates')
+    timestamp = models.DateTimeField(auto_now_add=True)
+    rate = models.PositiveSmallIntegerField(null=True)
